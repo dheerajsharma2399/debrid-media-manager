@@ -15,7 +15,6 @@ services:
       - 3000:3000
     env_file:
       - .env
-      - .env.local
     depends_on:
       - tor
     deploy:
