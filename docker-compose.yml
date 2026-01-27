@@ -16,6 +16,29 @@ services:
       - default
     ports:
       - 3010:3010
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - MEDIAFLOW_URL=${MEDIAFLOW_URL}
+      - REALDEBRID_CLIENT_ID=${REALDEBRID_CLIENT_ID}
+      - REALDEBRID_CLIENT_SECRET=${REALDEBRID_CLIENT_SECRET}
+      - REALDEBRID_REDIRECT_URI=${REALDEBRID_REDIRECT_URI}
+      - DATABASE_URL=${DATABASE_URL}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.dmm.rule=Host(`debridmediamanager.mooh.me`)"
+      - "traefik.http.routers.dmm.entrypoints=websecure"
+      - "traefik.http.routers.dmm.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dmm.service=dmm-service"
+      - "traefik.http.services.dmm-service.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Host=debridmediamanager.mooh.me"
+      - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Port=443"
+      - "traefik.http.routers.dmm.middlewares=dmm-headers"
     env_file:
       - .env
     depends_on:
