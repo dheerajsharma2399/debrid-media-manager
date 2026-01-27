@@ -1,6 +1,7 @@
 version: '3.9'
 services:
   tor:
+    container_name: debrid-media-manager-tor
     build:
       context: .
       dockerfile: tor.Dockerfile
@@ -8,13 +9,12 @@ services:
       replicas: 1
 
   web:
+    container_name: debrid-media-manager-web
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - 3010:3010
-    volumes:
-      - /home/ubuntu/dmm:/data
     networks:
       - dokploy-network
     environment:
@@ -28,7 +28,7 @@ services:
       - REALDEBRID_CLIENT_ID=${REALDEBRID_CLIENT_ID}
       - REALDEBRID_CLIENT_SECRET=${REALDEBRID_CLIENT_SECRET}
       - REALDEBRID_REDIRECT_URI=${REALDEBRID_REDIRECT_URI}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=mysql://dmm:password@db:3306/dmm?schema=public
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
@@ -48,10 +48,32 @@ services:
       - .env
     depends_on:
       - tor
+      - db
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+
+  db:
+    container_name: debrid-media-manager-db
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: dmm
+      MYSQL_USER: dmm
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/ubuntu/mysql-data:/var/lib/mysql
+    networks:
+      - dokploy-network
+
+volumes:
+  mysql_data:
+
 networks:
   dokploy-network:
     driver: bridge
