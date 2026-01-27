@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  tor:
+    build:
+      context: .
+      dockerfile: tor.Dockerfile
+    deploy:
+      replicas: 1
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+      - .env.local
+    depends_on:
+      - tor
+    deploy:
+      replicas: 0
+      restart_policy:
+        condition: on-failure
