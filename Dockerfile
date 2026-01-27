@@ -26,11 +26,11 @@ COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/.next/standalone .
 RUN apt-get update && apt-get install -y curl grep && rm -rf /var/lib/apt/lists/*
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 3010
+ENV PORT=3010
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=1s --start-period=3s --retries=1 \
-  CMD curl -s http://localhost:3000/api/healthz | grep -qm1 ok
+  CMD curl -s http://localhost:3010/api/healthz | grep -qm1 ok
