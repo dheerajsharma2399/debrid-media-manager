@@ -11,13 +11,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 3010:3010
     networks:
       - dokploy-network
       - default
     ports:
-      - 3000:3010
+      - 3010:3010
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
