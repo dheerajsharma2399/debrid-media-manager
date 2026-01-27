@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk --no-cache --update --upgrade add tor curl grep netcat-openbsd jq \
+RUN apk --no-cache --update --upgrade add tor curl grep netcat-openbsd jq dos2unix \
     && mv /etc/tor/torrc.sample  /etc/tor/torrc \
     && sed -i \
         -e 's/#SOCKSPort 192.168.0.1:9100/SOCKSPort 0.0.0.0:9050/g' \
@@ -8,7 +8,7 @@ RUN apk --no-cache --update --upgrade add tor curl grep netcat-openbsd jq \
         /etc/tor/torrc
 
 COPY renew-tor.sh /etc/tor/
-RUN chmod +x /etc/tor/renew-tor.sh
+RUN dos2unix /etc/tor/renew-tor.sh && chmod +x /etc/tor/renew-tor.sh
 
 USER tor
 ENTRYPOINT sh -c "/etc/tor/renew-tor.sh"
