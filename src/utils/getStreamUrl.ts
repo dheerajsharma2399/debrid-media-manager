@@ -42,6 +42,9 @@ export const getStreamUrl = async (
 			streamUrl = resp.download;
 			if (publicRuntimeConfig.mediaFlowUrl) {
 				streamUrl = `${publicRuntimeConfig.mediaFlowUrl}/proxy?d=${streamUrl}`;
+				if (publicRuntimeConfig.mediaFlowApiPassword) {
+					streamUrl += `&api_password=${publicRuntimeConfig.mediaFlowApiPassword}`;
+				}
 			}
 			rdLink = resp.link;
 
@@ -94,6 +97,9 @@ export const getBiggestFileStreamUrl = async (
 			streamUrl = resp.download;
 			if (publicRuntimeConfig.mediaFlowUrl) {
 				streamUrl = `${publicRuntimeConfig.mediaFlowUrl}/proxy?d=${streamUrl}`;
+				if (publicRuntimeConfig.mediaFlowApiPassword) {
+					streamUrl += `&api_password=${publicRuntimeConfig.mediaFlowApiPassword}`;
+				}
 			}
 			rdLink = resp.link;
 

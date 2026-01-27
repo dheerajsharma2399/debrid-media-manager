@@ -14,7 +14,7 @@ services:
     ports:
       - 3010:3010
     volumes:
-      - ./db:/data
+      - /home/ubuntu/dmm:/data
     networks:
       - dokploy-network
     environment:
@@ -24,6 +24,7 @@ services:
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - MEDIAFLOW_URL=${MEDIAFLOW_URL}
+      - MEDIAFLOW_API_PASSWORD=${MEDIAFLOW_API_PASSWORD}
       - REALDEBRID_CLIENT_ID=${REALDEBRID_CLIENT_ID}
       - REALDEBRID_CLIENT_SECRET=${REALDEBRID_CLIENT_SECRET}
       - REALDEBRID_REDIRECT_URI=${REALDEBRID_REDIRECT_URI}

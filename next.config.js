@@ -104,6 +104,7 @@ const nextConfig = {
 		githubClientId: process.env.GITHUB_CLIENT_ID,
 		discordClientId: process.env.DISCORD_CLIENT_ID,
 		mediaFlowUrl: process.env.MEDIAFLOW_URL,
+		mediaFlowApiPassword: process.env.MEDIAFLOW_API_PASSWORD,
 	},
 	webpack: (config) => {
 		config.cache = {
