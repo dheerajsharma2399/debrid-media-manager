@@ -15,7 +15,7 @@ services:
       - dokploy-network
       - default
     ports:
-      - 3010:3010
+      - 3000:3010
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.dmm.entrypoints=websecure"
       - "traefik.http.routers.dmm.tls.certresolver=letsencrypt"
       - "traefik.http.routers.dmm.service=dmm-service"
-      - "traefik.http.services.dmm-service.loadbalancer.server.port=30100"
+      - "traefik.http.services.dmm-service.loadbalancer.server.port=3000"
       - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Host=debridmediamanager.mooh.me"
       - "traefik.http.middlewares.dmm-headers.headers.customrequestheaders.X-Forwarded-Port=443"
