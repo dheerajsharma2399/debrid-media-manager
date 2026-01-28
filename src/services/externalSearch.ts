@@ -7,32 +7,39 @@ export async function searchExternal(path: string, queryParams: any): Promise<Se
     if (!EXTERNAL_SEARCH_URL) return [];
     
     try {
-        // Construct the full URL.
-        // Assuming EXTERNAL_SEARCH_API_HOSTNAME is like "https://corsproxy.org/?https://debridmediamanager.com" or just "https://debridmediamanager.com"
-        // We append the path (e.g. "api/torrents/movie") to it.
-        
-        const baseUrl = EXTERNAL_SEARCH_URL.replace(/\/$/, '');
-        // If the URL already contains a query string (like corsproxy), we need to be careful
-        // But usually the instruction is to append the path.
-        
-        const url = `${baseUrl}/${path}`;
-        
-        console.log(`[ExternalSearch] Requesting: ${url}`);
         console.log(`[ExternalSearch] Params:`, JSON.stringify(queryParams));
-
-        // Manually construct the query string to avoid Axios incorrectly using '&' 
-        // when the baseUrl (proxy) already has a '?'
         const queryString = new URLSearchParams(queryParams).toString();
-        const fullUrl = `${url}?${queryString}`;
+        let fullUrl = '';
 
-        console.log(`[ExternalSearch] Requesting (Manual): ${fullUrl}`);
+        // Check for proxy pattern "https://proxy/?https://target"
+        // We look for "/?http" to identify this pattern
+        if (EXTERNAL_SEARCH_URL.includes('/?http')) {
+            const splitIndex = EXTERNAL_SEARCH_URL.indexOf('/?');
+            // proxyBase will be like "https://corsproxy.org/?"
+            const proxyBase = EXTERNAL_SEARCH_URL.substring(0, splitIndex + 2); 
+            // targetBase will be like "https://debridmediamanager.com"
+            const targetBase = EXTERNAL_SEARCH_URL.substring(splitIndex + 2);
+            
+            // Construct the complete target URL with params
+            const targetUrl = `${targetBase.replace(/\/$/, '')}/${path}?${queryString}`;
+            
+            // Encode the entire target URL so the proxy handles it correctly
+            fullUrl = `${proxyBase}${encodeURIComponent(targetUrl)}`;
+        } else {
+            // Standard direct connection
+            const baseUrl = EXTERNAL_SEARCH_URL.replace(/\/$/, '');
+            fullUrl = `${baseUrl}/${path}?${queryString}`;
+        }
+
+        console.log(`[ExternalSearch] Requesting (Smart): ${fullUrl}`);
 
         const response = await axios.get(fullUrl, { 
-            // params: queryParams, // Do not pass params to axios, we added them to URL
             timeout: 20000,
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                // Use a browser-like User-Agent to avoid blocking by some proxies/WAFs
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
         });
 
