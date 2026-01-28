@@ -20,7 +20,14 @@ export async function searchExternal(path: string, queryParams: any): Promise<Se
         console.log(`[ExternalSearch] Requesting: ${url}`);
         console.log(`[ExternalSearch] Params:`, JSON.stringify(queryParams));
 
-        const response = await axios.get(url, { params: queryParams, timeout: 20000 });
+        const response = await axios.get(url, { 
+            params: queryParams, 
+            timeout: 20000,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
 
         console.log(`[ExternalSearch] Response Status: ${response.status}`);
         
@@ -29,7 +36,15 @@ export async function searchExternal(path: string, queryParams: any): Promise<Se
                 console.log(`[ExternalSearch] Found ${response.data.results.length} results.`);
                 return response.data.results;
              } else {
-                console.warn(`[ExternalSearch] Response data has no 'results' property. Keys: ${Object.keys(response.data).join(', ')}`);
+                let dataSnippet = '';
+                try {
+                    dataSnippet = typeof response.data === 'string' 
+                        ? response.data.substring(0, 500) 
+                        : JSON.stringify(response.data).substring(0, 500);
+                } catch (e) {
+                    dataSnippet = 'Could not stringify data';
+                }
+                console.warn(`[ExternalSearch] Response data has no 'results' property. Data preview: ${dataSnippet}`);
              }
         } else {
             console.warn(`[ExternalSearch] Response has no data.`);
