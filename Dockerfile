@@ -6,7 +6,7 @@ WORKDIR /app
 FROM base AS deps
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+    npm install
 
 # Build stage
 FROM base AS build
