@@ -31,6 +31,7 @@ services:
       - REALDEBRID_CLIENT_SECRET=${REALDEBRID_CLIENT_SECRET}
       - REALDEBRID_REDIRECT_URI=${REALDEBRID_REDIRECT_URI}
       - MDBLIST_KEY=${MDBLIST_KEY}
+      - EXTERNAL_SEARCH_API_HOSTNAME=${EXTERNAL_SEARCH_API_HOSTNAME}
       - DATABASE_URL=mysql://dmm:password@db:3306/dmm?schema=public
     labels:
       - "traefik.enable=true"

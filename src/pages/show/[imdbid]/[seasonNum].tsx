@@ -29,6 +29,7 @@ import { castToastOptions, searchToastOptions } from '@/utils/toastOptions';
 import { generateTokenAndHash } from '@/utils/token';
 import { withAuth } from '@/utils/withAuth';
 import axios, { AxiosError } from 'axios';
+import getConfig from 'next/config';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -69,6 +70,7 @@ const TvSearch: FunctionComponent = () => {
 	const [errorMessage, setErrorMessage] = useState('');
 	const [query, setQuery] = useState(defaultTorrentsFilter);
 	const [descLimit, setDescLimit] = useState(100);
+	const { publicRuntimeConfig: config } = getConfig();
 	const [rdKey] = useRealDebridAccessToken();
 	const adKey = useAllDebridApiKey();
 	const [onlyShowCached, setOnlyShowCached] = useState<boolean>(false);
@@ -157,9 +159,12 @@ const TvSearch: FunctionComponent = () => {
 		setErrorMessage('');
 		setSearchState('loading');
 		try {
-			const response = await axios.get<SearchApiResponse>(
-				`/api/torrents/tv?imdbId=${imdbId}&seasonNum=${seasonNum}&dmmProblemKey=${tokenWithTimestamp}&solution=${tokenHash}&onlyTrusted=${onlyTrustedTorrents}&maxSize=${episodeMaxSize}&page=${page}`
-			);
+			let path = `api/torrents/tv?imdbId=${imdbId}&seasonNum=${seasonNum}&dmmProblemKey=${tokenWithTimestamp}&solution=${tokenHash}&onlyTrusted=${onlyTrustedTorrents}&maxSize=${episodeMaxSize}&page=${page}`;
+			if (config.externalSearchApiHostname) {
+				path = encodeURIComponent(path);
+			}
+			let endpoint = `${config.externalSearchApiHostname || ''}/${path}`;
+			const response = await axios.get<SearchApiResponse>(endpoint);
 
 			if (response.status !== 200) {
 				setSearchState(response.headers.status ?? 'loaded');
