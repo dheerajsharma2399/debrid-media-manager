@@ -37,7 +37,7 @@ const handler: NextApiHandler = async (req, res) => {
 				`movie:${imdbId.toString().trim()}`,
 				maxSizeInGB,
 				pageNum
-			),
+			).then((res) => res || []),
 		];
 		if (onlyTrusted !== 'true') {
 			promises.push(
@@ -45,7 +45,7 @@ const handler: NextApiHandler = async (req, res) => {
 					`movie:${imdbId.toString().trim()}`,
 					maxSizeInGB,
 					pageNum
-				)
+				).then((res) => res || [])
 			);
 		}
         promises.push(
