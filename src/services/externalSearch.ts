@@ -20,8 +20,15 @@ export async function searchExternal(path: string, queryParams: any): Promise<Se
         console.log(`[ExternalSearch] Requesting: ${url}`);
         console.log(`[ExternalSearch] Params:`, JSON.stringify(queryParams));
 
-        const response = await axios.get(url, { 
-            params: queryParams, 
+        // Manually construct the query string to avoid Axios incorrectly using '&' 
+        // when the baseUrl (proxy) already has a '?'
+        const queryString = new URLSearchParams(queryParams).toString();
+        const fullUrl = `${url}?${queryString}`;
+
+        console.log(`[ExternalSearch] Requesting (Manual): ${fullUrl}`);
+
+        const response = await axios.get(fullUrl, { 
+            // params: queryParams, // Do not pass params to axios, we added them to URL
             timeout: 20000,
             headers: {
                 'Accept': 'application/json',
