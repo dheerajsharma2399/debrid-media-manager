@@ -32,6 +32,7 @@ export class MDBListClient {
 	 * Get info for a movie or show by IMDB ID
 	 */
 	async getInfoByImdbId(imdbId: string): Promise<MMovie | MShow> {
+		if (!this.apiKey) return {} as any;
 		const url = new URL(this.baseUrl);
 		url.searchParams.append('apikey', this.apiKey);
 		url.searchParams.append('i', imdbId);
@@ -43,6 +44,7 @@ export class MDBListClient {
 	 * Get info for a movie or show by TMDB ID
 	 */
 	async getInfoByTmdbId(tmdbId: number | string): Promise<MMovie | MShow> {
+		if (!this.apiKey) return {} as any;
 		const url = new URL(this.baseUrl);
 		url.searchParams.append('apikey', this.apiKey);
 		url.searchParams.append('tm', tmdbId.toString());
@@ -54,6 +56,7 @@ export class MDBListClient {
 	 * Search for lists by term
 	 */
 	async searchLists(term: string): Promise<any> {
+		if (!this.apiKey) return [];
 		const url = new URL(`${this.baseUrl}/lists/search`);
 		url.searchParams.append('apikey', this.apiKey);
 		url.searchParams.append('s', term);
@@ -65,6 +68,7 @@ export class MDBListClient {
 	 * Get items from a list by list ID
 	 */
 	async getListItems(listId: string): Promise<any> {
+		if (!this.apiKey) return [];
 		const url = new URL(`${this.baseUrl}/lists/${listId}/items`);
 		url.searchParams.append('apikey', this.apiKey);
 
@@ -75,6 +79,7 @@ export class MDBListClient {
 	 * Get top lists
 	 */
 	async getTopLists(): Promise<MList[]> {
+		if (!this.apiKey) return [];
 		const url = new URL(`${this.baseUrl}/lists/top`);
 		url.searchParams.append('apikey', this.apiKey);
 
@@ -168,7 +173,9 @@ export function getMdblistClient(): MDBListClient {
 		const apiKey = process.env.MDBLIST_KEY;
 
 		if (!apiKey) {
-			throw new Error('MDBLIST_KEY environment variable is not defined');
+			console.warn('MDBLIST_KEY environment variable is not defined. MDBList features will be disabled.');
+			// Return a dummy client or one that handles missing key gracefully
+			return new MDBListClient('');
 		}
 
 		mdblistClientInstance = new MDBListClient(apiKey);

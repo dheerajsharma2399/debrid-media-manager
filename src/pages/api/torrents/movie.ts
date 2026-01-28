@@ -1,3 +1,4 @@
+import { jackettService } from '@/services/jackett';
 import { flattenAndRemoveDuplicates, sortByFileSize } from '@/services/mediasearch';
 import { Repository } from '@/services/repository';
 import { validateTokenWithHash } from '@/utils/token';
@@ -30,7 +31,7 @@ const handler: NextApiHandler = async (req, res) => {
 	try {
 		const maxSizeInGB = maxSize ? parseInt(maxSize.toString()) : 0;
 		const pageNum = page ? parseInt(page.toString()) : 0;
-		const promises = [
+		const promises: Promise<any[]>[] = [
 			db.getScrapedTrueResults<any[]>(
 				`movie:${imdbId.toString().trim()}`,
 				maxSizeInGB,
@@ -46,9 +47,14 @@ const handler: NextApiHandler = async (req, res) => {
 				)
 			);
 		}
+        // Add Jackett search
+        if (jackettService.isConfigured()) {
+            promises.push(jackettService.searchMovie(imdbId.toString().trim()));
+        }
+
 		const results = await Promise.all(promises);
-		// should contain both results
-		const searchResults = [...(results[0] || []), ...(results[1] || [])];
+		// should contain all results
+		const searchResults = results.flat();
 		if (searchResults) {
 			try {
 				// Get reported hashes to filter out
