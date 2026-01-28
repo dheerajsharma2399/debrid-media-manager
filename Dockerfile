@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y curl grep && rm -rf /var/lib/apt/lists/
 EXPOSE 3010
 ENV PORT=3010
 ENV HOSTNAME="0.0.0.0"
-CMD ["sh", "-c", "npx prisma@5.19.1 db push && node server.js"]
+CMD ["sh", "-c", "echo 'Waiting for database...' && until nc -z db 3306; do sleep 1; done && echo 'Database is up!' && npx prisma@5.19.1 db push && node server.js"]
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=1s --start-period=3s --retries=1 \
