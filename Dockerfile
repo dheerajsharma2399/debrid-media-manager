@@ -25,7 +25,7 @@ COPY --from=build /app/.next/static ./.next/static
 # Copy the entire .next directory to ensure PWA files are included
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/.next/standalone .
-RUN apt-get update && apt-get install -y curl grep && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl grep netcat-openbsd && rm -rf /var/lib/apt/lists/*
 EXPOSE 3010
 ENV PORT=3010
 ENV HOSTNAME="0.0.0.0"
