@@ -1,3 +1,4 @@
+import { searchExternal } from '@/services/externalSearch';
 import { jackettService } from '@/services/jackett';
 import { flattenAndRemoveDuplicates, sortByFileSize } from '@/services/mediasearch';
 import { Repository } from '@/services/repository';
@@ -47,10 +48,29 @@ const handler: NextApiHandler = async (req, res) => {
 				)
 			);
 		}
-        // Add Jackett search
-        if (jackettService.isConfigured()) {
-            promises.push(jackettService.searchMovie(imdbId.toString().trim()));
-        }
+        promises.push(
+			(async () => {
+				let results: any[] = [];
+				if (process.env.EXTERNAL_SEARCH_API_HOSTNAME) {
+					try {
+						results = await searchExternal('api/torrents/movie', req.query);
+					} catch (e) {
+						console.error('External search error:', e);
+					}
+				}
+
+				if (results.length > 0) {
+					return results;
+				}
+
+				if (jackettService.isConfigured()) {
+					console.log('External search returned no results, falling back to Jackett...');
+					return jackettService.searchMovie(imdbId.toString().trim());
+				}
+
+				return [];
+			})()
+		);
 
 		const results = await Promise.all(promises);
 		// should contain all results

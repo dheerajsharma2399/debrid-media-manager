@@ -160,10 +160,7 @@ const TvSearch: FunctionComponent = () => {
 		setSearchState('loading');
 		try {
 			let path = `api/torrents/tv?imdbId=${imdbId}&seasonNum=${seasonNum}&dmmProblemKey=${tokenWithTimestamp}&solution=${tokenHash}&onlyTrusted=${onlyTrustedTorrents}&maxSize=${episodeMaxSize}&page=${page}`;
-			if (config.externalSearchApiHostname) {
-				path = encodeURIComponent(path);
-			}
-			let endpoint = `${config.externalSearchApiHostname || ''}/${path}`;
+			let endpoint = `/${path}`;
 			const response = await axios.get<SearchApiResponse>(endpoint);
 
 			if (response.status !== 200) {
