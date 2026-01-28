@@ -25,6 +25,7 @@ export class JackettClient {
 		const url = `${this.baseUrl}/api/v2.0/indexers/all/results/torznab/api`;
 		
 		try {
+			console.log(`[Jackett] Searching movie: ${url} (IMDB: ${imdbIdNum})`);
 			const response = await axios.get(url, {
 				params: {
 					apikey: this.apiKey,
@@ -35,9 +36,15 @@ export class JackettClient {
 				timeout: 15000,
 			});
 
-			return this.parseTorznabXml(response.data);
-		} catch (error) {
-			console.error('Jackett movie search failed:', error);
+			const results = this.parseTorznabXml(response.data);
+			console.log(`[Jackett] Found ${results.length} results for movie ${imdbId}`);
+			return results;
+		} catch (error: any) {
+			console.error('Jackett movie search failed:', error.message);
+			if (axios.isAxiosError(error) && error.response) {
+				console.error('[Jackett] Response status:', error.response.status);
+				console.error('[Jackett] Response data:', error.response.data);
+			}
 			return [];
 		}
 	}
@@ -59,14 +66,22 @@ export class JackettClient {
 				params.ep = episode;
 			}
 
+			console.log(`[Jackett] Searching show: ${url} (IMDB: ${imdbIdNum}, Season: ${season}, Episode: ${episode})`);
+
 			const response = await axios.get(url, {
 				params,
 				timeout: 15000,
 			});
 
-			return this.parseTorznabXml(response.data);
-		} catch (error) {
-			console.error('Jackett TV search failed:', error);
+			const results = this.parseTorznabXml(response.data);
+			console.log(`[Jackett] Found ${results.length} results for show ${imdbId} S${season}`);
+			return results;
+		} catch (error: any) {
+			console.error('Jackett TV search failed:', error.message);
+			if (axios.isAxiosError(error) && error.response) {
+				console.error('[Jackett] Response status:', error.response.status);
+				console.error('[Jackett] Response data:', error.response.data);
+			}
 			return [];
 		}
 	}

@@ -128,8 +128,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					let searchResults = await db.getSearchResults<TraktMediaItem[]>(
 						`trakt:${endpoint}`
 					);
+					if (!traktClientID) {
+						console.error('TRAKT_CLIENT_ID environment variable is not set.');
+						continue;
+					}
 					if (!searchResults?.length) {
-						searchResults = await getMediaData(traktClientID!, endpoint);
+						searchResults = await getMediaData(traktClientID, endpoint);
 						await db.saveSearchResults(`trakt:${endpoint}`, searchResults);
 					}
 					responseCache[endpoint] = {

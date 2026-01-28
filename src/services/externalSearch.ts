@@ -17,13 +17,34 @@ export async function searchExternal(path: string, queryParams: any): Promise<Se
         
         const url = `${baseUrl}/${path}`;
         
+        console.log(`[ExternalSearch] Requesting: ${url}`);
+        console.log(`[ExternalSearch] Params:`, JSON.stringify(queryParams));
+
         const response = await axios.get(url, { params: queryParams, timeout: 20000 });
-        if (response.data && response.data.results) {
-            return response.data.results;
+
+        console.log(`[ExternalSearch] Response Status: ${response.status}`);
+        
+        if (response.data) {
+             if (response.data.results) {
+                console.log(`[ExternalSearch] Found ${response.data.results.length} results.`);
+                return response.data.results;
+             } else {
+                console.warn(`[ExternalSearch] Response data has no 'results' property. Keys: ${Object.keys(response.data).join(', ')}`);
+             }
+        } else {
+            console.warn(`[ExternalSearch] Response has no data.`);
         }
         return [];
     } catch (e: any) {
         console.error('External search failed:', e.message);
+        if (axios.isAxiosError(e)) {
+             console.error('[ExternalSearch] Axios Error Details:', {
+                status: e.response?.status,
+                statusText: e.response?.statusText,
+                data: e.response?.data,
+                url: e.config?.url
+             });
+        }
         return [];
     }
 }
